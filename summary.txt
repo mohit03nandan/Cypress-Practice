@@ -56,3 +56,28 @@ Automatic video recording
 Component Testing
 Out-of-the-box support for UI coverage
 Out-of-the-box support for Accessibility testing
+
+-------------------------------------------------------------
+
+Summary: Page Transitions in Cypress
+
+Cypress automatically handles page transitions during a test, such as navigating from one page to another using cy.visit() or a .click() that loads a new page. When a page transition is detected, 
+Cypress pauses test execution until the new page has fully loaded.
+
+This built-in behavior prevents:
+
+Running commands on a stale (old) page
+
+Interacting with a partially loaded page
+
+Normally, Cypress waits up to 4 seconds to find DOM elements. However, when a page load event is detected, 
+Cypress automatically increases the timeout to 60 seconds for that specific event. If the page fails to load within this time, 
+the test fails with an error.
+
+Overall, Cypress dynamically adjusts timeouts based on application behavior, reducing the need for manual waits.
+ These timeout values can be configured in Cypress settings.
+
+
+------------------------
+cypress can also run in headless mode without opening the browser window 
+
