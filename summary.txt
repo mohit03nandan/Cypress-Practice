@@ -44,3 +44,15 @@ Cypress Components:
 
 Test Runner
 Dash Board Service
+
+--------------------------
+Below are the feature that cypress have and Selenium doesn't have.
+Direct browser interaction
+Minimal setup
+Built-in waiting and retry mechanisms
+Parallelization with automatic load balancing
+Time-travel debugging
+Automatic video recording
+Component Testing
+Out-of-the-box support for UI coverage
+Out-of-the-box support for Accessibility testing
