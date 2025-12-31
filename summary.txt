@@ -81,3 +81,68 @@ Overall, Cypress dynamically adjusts timeouts based on application behavior, red
 ------------------------
 cypress can also run in headless mode without opening the browser window 
 
+----------------------
+practice webiste
+https://rahulshettyacademy.com/seleniumPractise/#/
+
+----------------------
+Notes 
+Cypress support css selector only 
+
+----------------------
+
+Multiple ways to select locator in css
+
+1. by data attribute
+<button data-cy="submit-btn">Submit</button>
+cy.get('[data-cy="submit-btn"]')
+
+2. by id 
+<input id="email" />
+cy.get('#email')
+
+3. by class
+<div class="login-button"></div>
+cy.get('.login-button')
+
+4. by tag name
+cy.get('button')
+
+5. by Attribute selector
+<input type="text" name="username" />
+cy.get('input[name="username"]')
+cy.get('input[type="text"]')
+
+6. By Multiple attribute combination
+cy.get('input[name="username"][type="text"]')
+
+7. By Parent → Child relationship
+cy.get('.login-form > input')
+cy.get('.login-form').find('input')
+
+8. By Index (nth-child)
+cy.get('ul li:nth-child(2)')
+
+9. 
+By Text content (Cypress-specific)
+cy.contains('Submit')
+
+or with selector:
+cy.contains('button', 'Submit')
+
+10.By Traversal methods
+cy.get('.item').first()
+cy.get('.item').last()
+cy.get('.item').eq(2)
+
+11. By Form-specific selectors
+cy.get('input:checked')
+cy.get('input:disabled')
+cy.get('input:visible')
+
+12. Using aliases
+cy.get('[data-cy="submit-btn"]').as('submit')
+cy.get('@submit').click()
+
+
+
