@@ -144,5 +144,11 @@ cy.get('input:visible')
 cy.get('[data-cy="submit-btn"]').as('submit')
 cy.get('@submit').click()
 
+--------------------------------
+
+cy.wrap() is used to convert a plain JavaScript or jQuery element into a Cypress-controlled element 
+so that Cypress can apply automatic waiting, retries, and command chaining.
 
 
+-------------------------------
+cypress is async in nature means there is no gaurantee of order of execution  but cypress has wrapper that take care of 
