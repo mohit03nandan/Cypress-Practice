@@ -151,4 +151,37 @@ so that Cypress can apply automatic waiting, retries, and command chaining.
 
 
 -------------------------------
-cypress is async in nature means there is no gaurantee of order of execution  but cypress has wrapper that take care of 
+cypress is async in nature means there is no 
+gaurantee of order of execution  but cypress has wrapper 
+that take care of 
+
+cypress return promise so we are need to wait to 
+resolve the promise so for that we need .then to resolve that
+ but cypress saying this is noisy thing to use .then method instead 
+ us wrap that internally take care of
+
+---------------
+we can't store cypress promise behaviour in the variable
+that cypress supposed and seem it in non cypress command 
+for that we need to resolve by .then functionality 
+
+cypress has ability to resolve promise internally when two or more
+cypress command are used together example 
+cy.get('button').click()
+cy.get('input').type('hello')
+so above functionl will work as expected  because cypress will wait for click to complete before typing 
+----------
+cypress also support j-query methods 
+example cy.get('button').text(); but this is not work becasue .text() is not the cypress method it is 
+jQuery method for that we need to use .then() method to resolve this 
+
+example 
+cy.get('button').then(($button) => {
+    const text = $button.text();
+    console.log(text);
+});
+
+---------------
+if something is cypress command then we can't use .then() method to resolve it
+if something is not cypress command then we can use .then() method to resolve it
+-------------------
