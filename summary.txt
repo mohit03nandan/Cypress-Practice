@@ -185,3 +185,52 @@ cy.get('button').then(($button) => {
 if something is cypress command then we can't use .then() method to resolve it
 if something is not cypress command then we can use .then() method to resolve it
 -------------------
+
+checkbox 
+
+Cypress works with HTML <input type=\"checkbox\"> elements and provides built-in commands:
+
+.check()
+
+.uncheck()
+
+.should('be.checked')
+
+.should('not.be.checked')
+
+Select the radio with the value of 'US'
+<form>
+  <input type="radio" id="ca-country" value="CA" />
+  <label for="ca-country">Canada</label>
+  <input type="radio" id="us-country" value="US" />
+  <label for="us-country">United States</label>
+</form>
+
+cy.get('[type="radio"]').check('US')
+
+<form>
+  <input type="checkbox" id="subscribe" value="subscribe" />
+  <label for="subscribe">Subscribe to newsletter?</label>
+  <input type="checkbox" id="acceptTerms" value="accept" />
+  <label for="acceptTerms">Accept terms and conditions.</label>
+</form>
+
+cy.get('form input').check(['subscribe', 'accept'])
+
+-----------------------------
+how to Handling static dropdowns using select command with Cypress
+
+<select id="country">
+  <option value="CA">Canada</option>
+  <option value="US">United States</option>
+</select>
+
+cy.get('#country').select('US')
+Verify Selected Value
+cy.get('#country')
+  .select('India')
+  .should('have.value', 'IN')
+  ------------------------------
+we can handle  Dynamic dropdowns with each command Iteration
+
+-------------------
