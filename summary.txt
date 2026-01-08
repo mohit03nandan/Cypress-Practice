@@ -234,3 +234,77 @@ cy.get('#country')
 we can handle  Dynamic dropdowns with each command Iteration
 
 -------------------
+how cypress auto handle alert in web apps
+Types of alerts Cypress handles
+window.alert() cy.get('#alert-btn').click()
+window.confirm() cy.get('#confirm-btn').click()
+window.prompt() Cypress does not support prompt inputs directly.
+
+validation:
+cy.on('window:alert', (text) => {
+  expect(text).to.equal('Are you sure?')
+})
+
+cy.on('window:confirm', (text) => {
+  expect(text).to.contain('Do you want to proceed?')
+})
+
+cancel modal ; cy.on('window:confirm', () => false)
+Handling window.prompt()
+
+Stub the prompt before triggering it:
+
+cy.window().then((win) => {
+  cy.stub(win, 'prompt').returns('Cypress Input')
+})
+
+cy.get('#prompt-btn').click()
+
+--------------------------
+Why Cypress can’t handle child tabs directly
+
+Cypress runs in a single browser tab
+
+New tabs opened using:
+
+window.open()
+
+<a target="_blank">
+
+Cypress blocks new tabs by design
+
+approach 1: 
+cy.get('a[target="_blank"]')
+  .invoke('removeAttr', 'target')
+  .click()
+
+approach 2: 
+cy.window().then((win) => {
+  cy.stub(win, 'open').as('windowOpen')
+})
+
+cy.get('#openTabBtn').click()
+
+cy.get('@windowOpen')
+  .should('be.calledWith', 'https://example.com')
+
+approach 3
+Visit the Child Tab URL Manually
+
+Extract the URL and navigate directly:
+
+cy.get('a[target="_blank"]')
+  .then((el) => {
+    const url = el.prop('href')
+    cy.visit(url)
+  })
+
+
+Approach 4: Validate Only the Link (No Navigation)
+
+When navigation is not required:
+
+cy.get('a[target="_blank"]')
+  .should('have.attr', 'href')
+  .and('include', 'docs')
+-------------------------------------------
