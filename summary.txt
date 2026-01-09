@@ -308,3 +308,24 @@ cy.get('a[target="_blank"]')
   .should('have.attr', 'href')
   .and('include', 'docs')
 -------------------------------------------
+how to handle web table in cypress using each commands
+cy.get('#orderTable tbody tr').each(($row) => {
+  const orderId = $row.find('td').eq(0).text()
+  const status = $row.find('td').eq(2).text()
+
+  cy.log(`Order: ${orderId}, Status: ${status}`)
+})
+
+In Cypress, web tables are handled using the each() command to iterate through rows and columns. 
+We extract cell values using jQuery methods, apply conditional logic, 
+and perform actions like clicking buttons based on table data.
+
+--------------------------------
+Mouseover in cypress
+
+method 1 : npm i cypress-real-events
+method 2 : using j query invoke function method
+method 3 : using cy.get().trigger('mouseover')
+method 4 : Click instead of hover (Recommended by Cypress)
+
+-------------------------
