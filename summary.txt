@@ -329,3 +329,213 @@ method 3 : using cy.get().trigger('mouseover')
 method 4 : Click instead of hover (Recommended by Cypress)
 
 -------------------------
+
+📁 What is the fixtures folder in Cypress?
+
+The fixtures folder is used to store test data that you want to reuse in your Cypress tests.
+It mainly contains static data like JSON files, images, or any mock responses.
+
+📌 Instead of hard-coding data inside test scripts, we keep it in fixtures — this makes tests clean, reusable, and maintainable.
+
+🧠 Why do we need fixtures?
+
+In real projects (like the API + UI flows you test in logistics and admin panels), you often need:
+
+Login credentials
+
+User profiles
+
+Order data
+
+API request bodies
+
+Mock responses
+
+Putting these inside test files is messy.
+Fixtures separate test logic from test data.
+
+📂 Example structure
+cypress/
+ ├── fixtures/
+ │    ├── login.json
+ │    ├── users.json
+ │    └── orderData.json
+ ├── e2e/
+ └── support/
+
+🧪 Example 1 — login using fixture
+cypress/fixtures/login.json
+{
+  "username": "testuser@gmail.com",
+  "password": "Test@123"
+}
+
+login.cy.js
+cy.fixture("login").then((data) => {
+  cy.get("#email").type(data.username)
+  cy.get("#password").type(data.password)
+  cy.get("#loginBtn").click()
+})
+
+
+✅ If the password changes, update only the JSON file — no test changes needed.
+
+🧪 Example 2 — API testing using fixture
+cypress/fixtures/order.json
+{
+  "orderId": "ORD123",
+  "item": "iPhone",
+  "quantity": 1
+}
+
+cy.fixture("order").then((body) => {
+  cy.request("POST", "/api/orders", body).then((response) => {
+    expect(response.status).to.eq(201)
+  })
+})
+
+
+This is exactly how you’d validate APIs like LDH, StoreTrac, or Order services.
+
+🧪 Example 3 — Mock API using fixture (Very important)
+cy.intercept("GET", "/api/profile", { fixture: "user.json" })
+
+
+This means:
+
+“Instead of hitting real backend, return data from user.json”
+
+This is used for:
+
+UI testing without backend
+
+Testing error scenarios
+
+Performance & stability testing
+
+----------------------------------------
+🔧 What are Global Configuration changes in Cypress?
+These are defined in:
+
+cypress.config.js
+
+
+Instead of setting things again and again in every test, we configure them once here.
+
+📁 Where it is located
+cypress/
+cypress.config.js   ✅ (main config file)
+
+🧩 Example: Basic Global Config
+const { defineConfig } = require("cypress")
+
+module.exports = defineConfig({
+  e2e: {
+    baseUrl: "https://test.zomato.com",
+    defaultCommandTimeout: 8000,
+    pageLoadTimeout: 60000,
+    video: true,
+    screenshotOnRunFailure: true,
+    retries: 2,
+    viewportWidth: 1280,
+    viewportHeight: 720
+  }
+})
+
+Add in cypress.config.js
+env: {
+  adminUser: "admin@gmail.com",
+  adminPassword: "Admin@123",
+  apiBaseUrl: "https://api.test.com"
+}
+
+Use in test
+cy.get("#email").type(Cypress.env("adminUser"))
+cy.get("#password").type(Cypress.env("adminPassword"))
+
+------------------------------------------------------------------------
+🧩 What is Page Object Design Pattern?
+
+Page Object Model (POM) means:
+
+“Each application page is represented as a class or file that contains all the locators and actions related to that page.”
+
+So instead of writing:
+
+cy.get("#username")
+cy.get("#password")
+cy.get("#loginBtn")
+
+
+inside every test,
+we move them into a page file.
+
+This makes your framework:
+
+Cleaner
+
+Easier to maintain
+
+Scalable for large apps (like Admin + Rider + Vendor portals)
+
+❌ Without Page Object Model (Bad Practice)
+cy.visit("/login")
+cy.get("#email").type("admin@gmail.com")
+cy.get("#password").type("Admin@123")
+cy.get("#loginBtn").click()
+cy.get(".error").should("be.visible")
+
+
+If UI changes → 100 tests break 😵
+
+✅ With Page Object Model (Correct Way)
+📁 Folder structure
+cypress/
+ ├── e2e/
+ │    └── login.cy.js
+ ├── pages/
+ │    └── LoginPage.js
+ └── support/
+
+🧩 LoginPage.js
+class LoginPage {
+
+  elements = {
+    email: () => cy.get("#email"),
+    password: () => cy.get("#password"),
+    loginBtn: () => cy.get("#loginBtn"),
+    error: () => cy.get(".error")
+  }
+
+  visit() {
+    cy.visit("/login")
+  }
+
+  login(email, password) {
+    this.elements.email().type(email)
+    this.elements.password().type(password)
+    this.elements.loginBtn().click()
+  }
+
+  verifyError() {
+    this.elements.error().should("be.visible")
+  }
+}
+
+export default new LoginPage()
+
+🧪 login.cy.js
+import LoginPage from "../pages/LoginPage"
+
+describe("Login Test", () => {
+
+  it("Should show error for invalid login", () => {
+    LoginPage.visit()
+    LoginPage.login("wrong@gmail.com", "1234")
+    LoginPage.verifyError()
+  })
+
+})
+
+----------------------------------------
+
