@@ -539,3 +539,168 @@ describe("Login Test", () => {
 
 ----------------------------------------
 
+🔧 What are Cypress Custom Commands?
+
+Custom commands allow you to create your own Cypress commands.
+
+Instead of writing this everywhere:
+
+cy.get("#email").type("admin@gmail.com")
+cy.get("#password").type("Admin@123")
+cy.get("#loginBtn").click()
+
+
+You create:
+
+cy.login()
+
+
+This makes your framework:
+
+Cleaner
+
+Reusable
+
+Easy to maintain
+
+Very professional
+
+📁 Where to create custom commands
+cypress/support/commands.js   ✅
+
+🧩 Create a Custom Login Command
+Cypress.Commands.add("login", (email, password) => {
+  cy.get("#email").type(email)
+  cy.get("#password").type(password)
+  cy.get("#loginBtn").click()
+})
+
+Use in test
+cy.login("admin@gmail.com", "Admin@123")
+
+
+Now every test can reuse this.
+
+🔐 Real project version (using env)
+Cypress.Commands.add("adminLogin", () => {
+  cy.get("#email").type(Cypress.env("adminUser"))
+  cy.get("#password").type(Cypress.env("adminPassword"))
+  cy.get("#loginBtn").click()
+})
+
+cy.adminLogin()
+
+
+This is how enterprise QA teams work.
+
+⏸️ cy.pause()
+
+cy.pause() is used to stop test execution in the middle.
+
+cy.visit("/login")
+cy.pause()   // execution stops here
+cy.get("#email").type("test@gmail.com")
+
+
+Cypress UI will pause and allow you to:
+
+Inspect elements
+
+Open DevTools
+
+Check network
+
+Debug selectors
+
+Used during:
+
+Locator fixing
+
+Debugging flaky tests
+
+UI validation
+
+🧾 cy.log()
+
+Used to print messages in Cypress runner.
+
+cy.log("User logged in successfully")
+
+
+Example:
+
+cy.login()
+cy.log("Login completed")
+cy.get("#dashboard").should("be.visible")
+
+----------------------------------------
+
+
+❌ Why return does NOT work normally in Cypress
+
+This fails:
+
+function getToken() {
+  cy.request("/login").then((res) => {
+    return res.body.token   ❌
+  })
+}
+
+const token = getToken()
+
+
+Why?
+Because Cypress commands are async and queued.
+The function finishes before the API response arrives.
+
+So token becomes undefined.
+
+✅ Correct way: return Cypress chain
+
+You must return the Cypress command itself
+
+function getToken() {
+  return cy.request("/login").then((res) => {
+    return res.body.token
+  })
+}
+
+
+Now use it like:
+
+getToken().then((token) => {
+  cy.log(token)
+})
+
+🧠 Key Rule (Golden Rule)
+
+Never try to return data from Cypress → always return it into a .then()
+
+🔁 Nested then problem
+
+❌ Bad code (callback hell)
+
+cy.request("/login").then((res1) => {
+  cy.request("/orders").then((res2) => {
+    cy.request("/invoice").then((res3) => {
+      // messy 😵
+    })
+  })
+})
+
+✅ Cypress chaining (Correct way)
+cy.request("/login")
+  .then((res) => res.body.token)
+  .then((token) => {
+     return cy.request({
+       url: "/orders",
+       headers: { Authorization: token }
+     })
+  })
+  .then((orders) => {
+     cy.log(orders.body.length)
+  })
+
+  --------------------------
+
+  
