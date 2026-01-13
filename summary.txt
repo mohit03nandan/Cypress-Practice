@@ -869,3 +869,24 @@ module.exports = defineConfig({
 6. cypress/reports/mochawesome.html
 
 -------------------------------------------
+Rerun Failed Tests with Cypress Retries
+
+> Retry at Test Level
+
+You can also apply retries to a single test:
+
+it("should submit order", { retries: 3 }, () => {
+  cy.get("#submit").click()
+  cy.contains("Order placed").should("be.visible")
+})
+
+
+Only this test will retry 3 times.
+
+> Retry at Suite Level
+describe("Checkout Flow", { retries: 2 }, () => {
+  it("should add item")
+  it("should place order")
+})
+
+-------------------------------------------
