@@ -703,4 +703,108 @@ cy.request("/login")
 
   --------------------------
 
-  
+  Importance of Environment Variables in Cypress Framework
+  Environment variables are dynamic values used to:
+  Change URLs
+  Pass credentials
+  Control feature flags
+  Switch test environments (QA, UAT, PROD)
+
+🛠 How to Set Environment Variables in Cypress
+
+Cypress supports multiple ways to define environment variables based on where and how you run tests.
+
+1️⃣ Using cypress.config.js (Framework level)
+
+Use this for default values.
+
+const { defineConfig } = require("cypress");
+
+module.exports = defineConfig({
+  env: {
+    baseUrl: "https://qa.myapp.com",
+    apiUrl: "https://qa.api.myapp.com",
+    username: "qa_user"
+  }
+});
+
+
+Access in tests:
+
+Cypress.env("baseUrl")
+
+2️⃣ Using cypress.env.json (Local environment)
+
+Create a file in project root:
+
+cypress.env.json
+
+{
+  "baseUrl": "https://uat.myapp.com",
+  "username": "mohit",
+  "password": "Test@123"
+}
+
+
+🚫 Add this file to .gitignore
+(never commit secrets)
+
+3️⃣ Using .env file (Best for security)
+
+Install dotenv:
+
+npm install dotenv
+
+
+Create .env
+
+CYPRESS_baseUrl=https://prod.myapp.com
+CYPRESS_username=prod_user
+CYPRESS_password=Secret123
+
+
+Cypress automatically reads variables starting with CYPRESS_.
+
+Access:
+
+Cypress.env("username")
+
+4️⃣ Using Command Line (On-the-fly)
+
+Run Cypress like this:
+
+npx cypress run --env baseUrl=https://staging.myapp.com,username=admin
+
+
+This overrides all other values.
+
+5️⃣ Using CI/CD Pipeline (Jenkins, GitHub Actions)
+
+Example GitHub Actions:
+
+env:
+  CYPRESS_baseUrl: https://prod.myapp.com
+  CYPRESS_username: admin
+  CYPRESS_password: ${{ secrets.PASSWORD }}
+
+6️⃣ Priority Order (Very Important)
+
+Cypress loads env variables in this order:
+
+Command line
+
+CI variables
+
+cypress.env.json
+
+cypress.config.js
+
+👉 The highest priority always wins.
+
+7️⃣ How to use in Test
+cy.visit(Cypress.env("baseUrl"))
+
+cy.get("#email").type(Cypress.env("username"))
+cy.get("#password").type(Cypress.env("password"))
+
+-------------------------------------------------------
