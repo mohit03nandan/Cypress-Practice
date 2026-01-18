@@ -890,3 +890,106 @@ describe("Checkout Flow", { retries: 2 }, () => {
 })
 
 -------------------------------------------
+Bdd Framework :
+🧠 PART 1: BDD & Cucumber – BASICS
+1️⃣ What is BDD (Behavior Driven Development)?
+
+BDD = writing tests in business-readable language
+
+instead of : it('should login', () => { ... })
+
+use : 
+Given user is on login page  
+When user enters valid credentials  
+Then user should be logged in successfully
+
+
+| Keyword   | Purpose                  |
+| --------- | ------------------------ |
+| Feature   | High-level functionality |
+| Scenario  | Test case                |
+| Given     | Pre-condition            |
+| When      | Action                   |
+| Then      | Expected result          |
+| And / But | Additional steps         |
+
+
+step 1  : Create Cypress Project
+npm init -y
+npm install cypress --save-dev
+npx cypress open
+
+
+step2 : Install Cucumber Preprocessor
+npm install --save-dev \
+@badeball/cypress-cucumber-preprocessor \
+@bahmutov/cypress-esbuild-preprocessor
+
+
+step3 : Configure cypress.config.js
+const { defineConfig } = require("cypress");
+const createBundler = require("@bahmutov/cypress-esbuild-preprocessor");
+const addCucumberPreprocessorPlugin =
+  require("@badeball/cypress-cucumber-preprocessor").addCucumberPreprocessorPlugin;
+
+module.exports = defineConfig({
+  e2e: {
+    specPattern: "**/*.feature",
+    async setupNodeEvents(on, config) {
+      await addCucumberPreprocessorPlugin(on, config);
+      on(
+        "file:preprocessor",
+        createBundler({
+          plugins: [],
+        })
+      );
+      return config;
+    },
+  },
+});
+
+
+step4 : Folder Structure
+
+cypress/
+ ├── e2e/
+ │   ├── features/
+ │   │   └── login.feature
+ │   ├── step_definitions/
+ │   │   └── loginSteps.js
+ ├── support/
+ │   ├── commands.js
+ │   └── e2e.js
+
+step5 : WRITING TEST
+Feature: Login Functionality
+
+  Scenario: Successful login with valid credentials
+    Given user opens login page
+    When user enters valid username and password
+    Then user should be logged in successfully
+
+step6 : Step Definition File
+
+import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
+
+Given("user opens login page", () => {
+  cy.visit("/login");
+});
+
+When("user enters valid username and password", () => {
+  cy.get("#username").type("admin");
+  cy.get("#password").type("password123");
+  cy.get("#loginBtn").click();
+});
+
+Then("user should be logged in successfully", () => {
+  cy.url().should("include", "/dashboard");
+});
+
+
+there are the multipleTopic that need to practice for cucumber :
+* REUSABILITY & BEST PRACTICES
+* Background Keyword
+* Hooks (Before / After)
+---------------------------------------------------
