@@ -993,3 +993,38 @@ there are the multipleTopic that need to practice for cucumber :
 * Background Keyword
 * Hooks (Before / After)
 ---------------------------------------------------
+🔹 What is cy.intercept()?
+
+cy.intercept() is Cypress’s way to listen to, control, mock, 
+or modify network requests (HTTP/HTTPS) made by your application during tests.
+
+syntax : 
+1. cy.intercept(method, url, response)
+2. cy.intercept({
+  method: 'GET',
+  url: '/api/orders'
+}, response)
+
+> No Mocking 
+cy.intercept('GET', '/api/orders').as('getOrders')
+
+cy.visit('/orders')
+
+cy.wait('@getOrders').then((interception) => {
+  expect(interception.response.statusCode).to.eq(200)
+})
+
+
+> mocking with stubs
+cy.intercept('GET', '/api/orders', {
+  statusCode: 200,
+  body: {
+    orders: [
+      { id: 1, name: 'Order 1' },
+      { id: 2, name: 'Order 2' }
+    ]
+  }
+}).as('mockOrders')
+
+cy.visit('/orders')
+cy.wait('@mockOrders')
