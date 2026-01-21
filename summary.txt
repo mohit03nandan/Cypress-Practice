@@ -890,6 +890,61 @@ describe("Checkout Flow", { retries: 2 }, () => {
 })
 
 -------------------------------------------
+
+cypress extract token through API response
+
+it("Login API - extract token", () => {
+  cy.request({
+    method: "POST",
+    url: "/api/login",
+    body: {
+      email: "test@gmail.com",
+      password: "password123"
+    }
+  }).then((response) => {
+    expect(response.status).to.eq(200)
+
+    const token = response.body.token
+    expect(token).to.not.be.null
+
+    // Save token
+    Cypress.env("authToken", token)
+  })
+})
+
+
+Store Token in localStorage (Most Common)
+beforeEach(() => {
+  cy.request("POST", "/api/login", {
+    email: "test@gmail.com",
+    password: "password123"
+  }).then((res) => {
+    const token = res.body.token
+
+    cy.visit("/") // window must exist
+    cy.window().then((win) => {
+      win.localStorage.setItem("token", token)
+    })
+  })
+})
+
+it("Access dashboard using stored token", () => {
+  cy.visit("/dashboard")
+})
+
+Best Practice – cy.session() with API Login ⭐
+Cypress.Commands.add("loginByApi", () => {
+  cy.session("api-login", () => {
+    cy.request("POST", "/api/login", {
+      email: "test@gmail.com",
+      password: "password123"
+    }).then(res => {
+      cy.visit("/")
+      window.localStorage.setItem("token", res.body.token)
+    })
+  })
+})
+
 Bdd Framework :
 🧠 PART 1: BDD & Cucumber – BASICS
 1️⃣ What is BDD (Behavior Driven Development)?
