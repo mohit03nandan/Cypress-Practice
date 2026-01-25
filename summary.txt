@@ -1083,3 +1083,104 @@ cy.intercept('GET', '/api/orders', {
 
 cy.visit('/orders')
 cy.wait('@mockOrders')
+--------------------------
+
+cypress database testing
+
+Short answer first: Cypress does not directly connect to databases (by design). 
+But you can still do solid database testing with Cypress by using a few clean patterns that real QA teams use in production.
+
+✅ Use cy.task() to query DB (MOST USED)
+Cypress allows Node.js code to run via cy.task(), and Node CAN talk to databases.
+
+flow : Cypress Test  → cy.task() → Node process → Database
+
+folder structure
+cypress/
+ ├── e2e/
+ │   └── login.cy.js
+ ├── plugins/
+ │   └── db.js
+cypress.config.js
+
+
+commands : npm install mysql2
+Create DB task (Node side)
+📄 cypress/plugins/db.js
+
+const mysql = require("mysql2/promise");
+
+async function queryDB(query, config) {
+  const connection = await mysql.createConnection(config);
+  const [rows] = await connection.execute(query);
+  await connection.end();
+  return rows;
+}
+
+module.exports = (on) => {
+  on("task", {
+    queryDb({ query, config }) {
+      return queryDB(query, config);
+    }
+  });
+};
+
+
+Register task in Cypress config
+📄 cypress.config.js
+
+const dbTasks = require("./cypress/plugins/db");
+
+module.exports = {
+  e2e: {
+    setupNodeEvents(on, config) {
+      dbTasks(on);
+      return config;
+    },
+  },
+};
+
+Use DB assertion in test
+📄 login.cy.js
+it("should insert user into DB after signup", () => {
+  cy.visit("/signup");
+
+  cy.get("#email").type("testuser@gmail.com");
+  cy.get("#password").type("Password123");
+  cy.get("button").click();
+
+  cy.task("queryDb", {
+    query: "SELECT * FROM users WHERE email='testuser@gmail.com'",
+    config: {
+      host: "localhost",
+      user: "root",
+      password: "password",
+      database: "test_db"
+    }
+  }).then((result) => {
+    expect(result.length).to.eq(1);
+    expect(result[0].email).to.eq("testuser@gmail.com");
+  });
+});
+
+1️⃣ What is cy.task()? (In simple words)
+
+cy.task() lets Cypress talk to Node.js (backend world)
+
+Cypress tests run inside the browser, but:
+
+Browser ❌ cannot access DB
+
+Browser ❌ cannot read files securely
+
+Browser ❌ cannot access OS / secrets
+
+So Cypress gives us cy.task() as a bridge.
+
+Browser Test (Cypress)
+      |
+      |  cy.task("doSomething")
+      ↓
+Node.js (outside browser)
+      |
+      |  DB / File / OS / Scripts
